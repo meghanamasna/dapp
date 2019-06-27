@@ -1,12 +1,32 @@
-console.log("outside");
+//console.log("outside");
 App = {
   web3Provider: null,
   contracts: {},
+  books: Array, 
+
 
   init: async function() {
     console.log("init function");
+     $.ajaxSetup({async: false});
+    $.getJSON('../books.json',function(data){
+      console.log("inside");
+      var bookrow = $('#bookrow');
+      var bookTemplate = $('#bookTemplate');
+      for(i=0; i<data.length; i++){
+        bookTemplate.find('.book-isbn').text(data[i].isbn);
+        bookTemplate.find('.book-name').text(data[i].name);
+        bookTemplate.find('.book-author').text(data[i].author);
+        console.log(data[i].isbn);
+        bookTemplate.find('.btn-req').attr('data-isbn',data[i].isbn);
+        console.log(bookTemplate.find('.btn-req').attr('data-isbn',data[i].isbn));
+        bookrow.append(bookTemplate.html());
+      }
 
-    return await App.initWeb3();
+
+    });
+    
+
+    return  await App.initWeb3();
   },
 
   initWeb3: async function() {
@@ -16,7 +36,7 @@ App = {
       App.web3Provider = window.ethereum;
       try {
         // Request account access
-        await window.ethereum.enable();
+         await window.ethereum.enable();
       } catch (error) {
         // User denied account access...
         console.error("User denied account access")
@@ -35,16 +55,22 @@ App = {
         return App.initContract();
   },
 
-  initContract: function() {
+  initContract:  function() {
     console.log("init contract");
-    $.getJSON('process.json',function(data){
+    $.getJSON('Book.json',function(data){
       console.log("inside getjson");
+     // console.log(data);
 
-      var bookArtifact=data;
-      App.contracts.process=TruffleContract(bookArtifact);
-      App.contracts.process.setProvider(App.web3Provider);
+      var bookArtifact = data;
+      App.contracts.Book = TruffleContract(bookArtifact);
+      console.log("truffle contract");
+      App.contracts.Book.setProvider(App.web3Provider);
+      console.log(App.contracts.Book);
+
       
     });
+    console.log("outside getjson");
+
 
     return App.bindEvents();
 
@@ -54,33 +80,83 @@ App = {
     console.log("binding");
 
     $(document).on('click','.btn-add',App.addBook);
-    return App.addBook();
+    $(document).on('click','.bk-req',App.reqBook);
+    
+    //return App.addBook();
    
   },
   addBook: function(event){
+
     console.log("adding");
+    
+    console.log(i);
     web3.eth.getAccounts(function(error,accounts){
       if(error){
         console.log(error);
       }
       
-    var account=accounts[0];
+    var account = accounts[0];
+    console.log(account);
     var binstance;
-    App.contracts.process.deployed().then(function(instance){
-      binstance=instance;
-      return binstance.addBook($('#isbn').val(),$('#name').val(),$('#author').val(),{from:account});
-     } );
+    
 
-    });
-  }
+    App.contracts.Book.deployed().then(function(instance){
+      binstance = instance;
+      console.log("inside add book");
 
+     // return binstance.viewallbooks.call();
+     binstance.addBook(123,"hekko","ek2e").then(function(){
+      console.log("added");
+
+        });
+      });
+     });
+  
+},
+reqBook: function(event){
+  console.log("requesting");
+  //console.log(data);
+  event.preventDefault();
+
+    var isbn = $(event.target).data('isbn');
+
+    console.log(isbn);
  
+  web3.eth.getAccounts(function(error,accounts){
+      if(error){
+        console.log(error);
+      }
+      
+    var account = accounts[0];
+    var rinstance;
+    App.contracts.Book.deployed().then(function(instance){
+      rinstance = instance;
+      console.log("here");
 
+      return rinstance.reqbook(isbn);
+     
+    }).then(function(){
+        console.log("in books");
+       
+          $('.bk-req').eq(isbn).text('requested').attr('disabled', true);
+        
+       console.log("requested");
+    }).then(function(){
+      return App.getStatus();
+    });
+
+});
+},
+getStatus: function(event){
+  console.log("showing status");
+
+}
 };
 
 $(function() {
-  $(window).on('load',function() {
+  $(window).load(function() {
     console.log("initiating");
     App.init();
   });
 });
+
