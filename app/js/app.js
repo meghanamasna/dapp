@@ -89,7 +89,7 @@ App = {
 
     console.log("adding");
     
-    console.log(i);
+    
     web3.eth.getAccounts(function(error,accounts){
       if(error){
         console.log(error);
@@ -135,20 +135,25 @@ reqBook: function(event){
 
       return rinstance.reqbook(isbn);
      
-    }).then(function(){
+    }).then(function(data){
         console.log("in books");
-       
+        console.log(data);
           $('.bk-req').eq(isbn).text('requested').attr('disabled', true);
         
        console.log("requested");
-    }).then(function(){
-      return App.getStatus();
+       return App.getStatus();
     });
+      
+    
 
 });
 },
-getStatus: function(event){
+getStatus: function(data){
+
+  console.log(data);
+  
   console.log("showing status");
+  
 
 }
 };
@@ -159,4 +164,3 @@ $(function() {
     App.init();
   });
 });
-
