@@ -11,6 +11,22 @@ app.get('/addbook', function(req, res)  {
   res.sendFile(__dirname + "/app/" + "addbook.html");
 })
 
+app.get('/mybooks', function(req, res)  {
+  res.sendFile(__dirname + "/app/" + "mybooks.html");
+})
+
+app.get('/requests', function(req, res)  {
+  res.sendFile(__dirname + "/app/" + "requests.html");
+})
+
+app.get('/status', function(req, res)  {
+  res.sendFile(__dirname + "/app/" + "status.html");
+})
+
+app.get('/about', function(req, res)  {
+  res.sendFile(__dirname + "/app/" + "about.html");
+})
+
 module.exports = {
 	"server" : {
 		"baseDir" : ["./app","./build/contracts"],
