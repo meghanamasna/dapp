@@ -1,24 +1,30 @@
 //console.log("outside");
+
 App = {
   web3Provider: null,
   contracts: {},
   books: Array, 
-
+  
 
   init: async function() {
+    //check the state of book
+    //if req print 
+    //disable the request
     console.log("init function");
      $.ajaxSetup({async: false});
     $.getJSON('../books.json',function(data){
       console.log("inside");
+      //console.log(data);
       var bookrow = $('#bookrow');
       var bookTemplate = $('#bookTemplate');
       for(i=0; i<data.length; i++){
-        bookTemplate.find('.book-isbn').text(data[i].isbn);
+        console.log(bookTemplate.find('.book-isbn').text(data[i].isbn));
         bookTemplate.find('.book-name').text(data[i].name);
         bookTemplate.find('.book-author').text(data[i].author);
         console.log(data[i].isbn);
-        bookTemplate.find('.btn-req').attr('data-isbn',data[i].isbn);
-        console.log(bookTemplate.find('.btn-req').attr('data-isbn',data[i].isbn));
+        bookTemplate.find('.b').attr('id',data[i].isbn);
+
+        console.log(bookTemplate.find('.bk-req').attr('id',data[i].isbn));
         bookrow.append(bookTemplate.html());
       }
 
@@ -70,8 +76,7 @@ App = {
       
     });
     console.log("outside getjson");
-
-
+    App.viewallbooks();
     return App.bindEvents();
 
   },
@@ -105,12 +110,14 @@ App = {
       console.log("inside add book");
 
      // return binstance.viewallbooks.call();
-     binstance.addBook(123,"hekko","ek2e").then(function(){
+     console.log(binstance.addBook($('#isbn').val(),$('#name').val(),$('#author').val()));
+     binstance.addBook($('#isbn').val(),$('#name').val(),$('#author').val()).then(function(){
       console.log("added");
 
         });
       });
      });
+    App.viewallbooks();
   
 },
 reqBook: function(event){
@@ -118,9 +125,12 @@ reqBook: function(event){
   //console.log(data);
   event.preventDefault();
 
-    var isbn = $(event.target).data('isbn');
-
-    console.log(isbn);
+    //var isbn = $(event.target).data('isbn');
+    var id = $(event.target).prop('id');
+    console.log(event.target);
+    //1. indexof(array)
+    //2. update state of attribute
+    console.log(id);
  
   web3.eth.getAccounts(function(error,accounts){
       if(error){
@@ -133,12 +143,12 @@ reqBook: function(event){
       rinstance = instance;
       console.log("here");
 
-      return rinstance.reqbook(isbn);
+      return rinstance.reqbook(id);
      
     }).then(function(data){
         console.log("in books");
         console.log(data);
-          $('.bk-req').eq(isbn).text('requested').attr('disabled', true);
+          $('.bk-req').eq(id).text('requested').attr('disabled', true);
         
        console.log("requested");
        return App.getStatus();
@@ -148,13 +158,22 @@ reqBook: function(event){
 
 });
 },
-getStatus: function(data){
+viewallbooks: function(){
 
-  console.log(data);
-  
-  console.log("showing status");
-  
+  var viewinstance;
+  App.contracts.Book.deployed().then(function(instance){
+    viewinstance = instance;
+    console.log(instance.viewallbooks());
 
+  });
+},
+getStatus: function(){
+  App.contracts.Book.deployed().then(function(instance){
+    //instance.viewstatus();
+
+  });
+
+  
 }
 };
 
