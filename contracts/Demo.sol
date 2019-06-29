@@ -25,7 +25,7 @@ contract Book
         books[books.length-1].author = _author;
         return books.length;
     }
-     function viewallbooks() public view returns( memory ) {
+     function viewallbooks() public view returns(bookinfo[] memory ) {
         bookinfo[] memory books1 = new bookinfo[](books.length);
         return books;
        
