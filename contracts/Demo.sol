@@ -1,17 +1,10 @@
-pragma solidity >=0.4.22 <0.6.0;
+pragma solidity ^0.5.0;
 pragma experimental ABIEncoderV2;
-contract initial
+
+
+contract Book 
 {
-    struct person {
-        string username;
-        string email;
-        string password;
-    }
-    function enroll(string memory username,string memory email,string memory password) public returns (bool);
-    function login(string memory email, string memory  password)public  ;
-}
-contract mybook 
-{   uint256 public bookscount=0;
+    uint256 public bookscount=0;
     
     struct bookinfo{
        uint8 state; // 1 request ,2-accept,3-reject,0-free
@@ -32,33 +25,12 @@ contract mybook
         books[books.length-1].author = _author;
         return books.length;
     }
-    function viewallbooks() public  view returns(bookinfo[] memory ) {
+     function viewallbooks() public view returns( memory ) {
+        bookinfo[] memory books1 = new bookinfo[](books.length);
         return books;
+       
+                       
     }
-    bookinfo[] public my;
-    function mybooks() public returns(bookinfo[] memory)
-    {
-             for (uint256 i=0;i<books.length;i++){
-                 if(books[i].a==msg.sender)
-                 {
-                     my.length++;
-                     my[my.length-1].state=books[i].state;
-                     my[my.length-1].isbn=books[i].isbn;
-                     my[my.length-1].bookname=books[i].bookname;
-                     my[my.length-1].author=books[i].author;
-                     my[my.length-1].a=books[i].a;
-                     
-                 }
-             }
-             return my;
-    }
-     bookinfo[] public s;
-     
-    
-}
-
-contract process is mybook
-{
     
     function reqbook(uint256 _isbn) public returns(bool){
          for (uint256 i=0;i<books.length;i++){
@@ -83,18 +55,7 @@ contract process is mybook
          }
          return false;
     }
-    function rejbook(uint256 _isbn) public returns(bool){
-         for (uint256 i=0;i<books.length;i++){
-             if(books[i].isbn==_isbn){
-                 require(books[i].state==1);// can reject only if book is requested
-                 require(books[i].state!=2);//cannot reject after accepting
-                 require(books[i].a==msg.sender);
-                 books[i].state=3;
-                 return true;
-             }
-         }
-         return false;
-    }
+    
     function viewstatus(uint256 _isbn)public view returns(uint8)
     {
         for (uint256 i=0;i<books.length;i++){
