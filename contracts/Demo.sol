@@ -6,14 +6,14 @@ contract Book
 {
     uint256 public bookscount=0;
     
-    struct bookinfo{
+    struct Bookinfo{
        uint8 state; // 1 request ,2-accept,3-reject,0-free
         address a;
         uint256 isbn;
         string author;
         string bookname;
     }
-    bookinfo[] public books;
+    Bookinfo[] public books;
     function addBook(uint256 _isbn, string memory _bookname, string memory _author) public  
       returns(uint) {
            bookscount=bookscount+1;
@@ -25,9 +25,19 @@ contract Book
         books[books.length-1].author = _author;
         return books.length;
     }
-     function viewallbooks() public view returns(bookinfo[] memory ) {
-        bookinfo[] memory books1 = new bookinfo[](books.length);
-        return books;
+     function viewallbooks() public view returns(uint[] memory, string[] memory, string[] memory ) {
+        //bookinfo[] memory books1 = new bookinfo[](books.length);
+        uint[] memory isbn = new uint[](books.length);
+        string[] memory bookname = new string[](books.length);
+        string[] memory author = new string[](books.length);
+        for(uint i = 0; i < books.length; i++){
+            Bookinfo storage book1 = books[i];
+            isbn[i] = book1.isbn;
+            bookname[i] = book1.bookname;
+            author[i] = book1.author;
+
+        }
+        return (isbn, bookname, author);
        
                        
     }
